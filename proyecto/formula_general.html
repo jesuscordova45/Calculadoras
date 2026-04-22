@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fórmula General</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+h1 {
+    color: #38bdf8;
+}
+
+/* inputs */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+}
+
+/* teclado tipo grid */
+.teclado {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.teclado button {
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    background: #38bdf8; /* 🔥 azul para TODOS */
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.teclado button:active {
+    transform: scale(0.95);
+}
+
+/* resultado */
+.resultado {
+    margin-top: 20px;
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: left;
+}
+
+/* 🔥 botón regresar estilo ancho */
+.teclado .btn-regresar {
+    grid-column: span 2;
+    background: #ef4444;
+    color: rgb(0, 0, 0);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📐 Fórmula General</h1>
+
+<input id="a" inputmode="decimal" placeholder="Valor de a">
+<input id="b" inputmode="decimal" placeholder="Valor de b">
+<input id="c" inputmode="decimal" placeholder="Valor de c">
+
+<div class="resultado" id="salida"></div>
+
+<div class="teclado">
+
+    <button onclick="resolver()">Resolver</button>
+    <button onclick="limpiar()">Limpiar</button>
+    <button class="btn-regresar" onclick="regresar()">Regresar</button>
+
+</div>
+
+</div>
+
+<script>
+
+// 🔥 filtrar input
+function filtrarInput(e) {
+    e.target.value = e.target.value.replace(/[^0-9./-]/g, "");
+}
+
+["a","b","c"].forEach(id => {
+    document.getElementById(id).addEventListener("input", filtrarInput);
+});
+
+// validar
+function esValido(v) {
+    return /^-?\d+(\.\d+)?(\/\d+(\.\d+)?)?$/.test(v);
+}
+
+// parse fracción
+function parseNumero(valor) {
+    if (valor.includes("/")) {
+        let [num, den] = valor.split("/");
+        return parseFloat(num) / parseFloat(den);
+    }
+    return parseFloat(valor);
+}
+
+// resolver
+function resolver() {
+
+    let va = document.getElementById("a").value;
+    let vb = document.getElementById("b").value;
+    let vc = document.getElementById("c").value;
+
+    let salida = document.getElementById("salida");
+
+    if (!esValido(va) || !esValido(vb) || !esValido(vc)) {
+        salida.innerHTML = "❌ Solo números válidos o fracciones";
+        return;
+    }
+
+    let a = parseNumero(va);
+    let b = parseNumero(vb);
+    let c = parseNumero(vc);
+
+    if (a === 0) {
+        salida.innerHTML = "❌ No es cuadrática";
+        return;
+    }
+
+    let d = b*b - 4*a*c;
+
+    if (d > 0) {
+        let x1 = (-b + Math.sqrt(d)) / (2*a);
+        let x2 = (-b - Math.sqrt(d)) / (2*a);
+
+        salida.innerHTML = `
+        📌 Δ = ${d}<br>
+        ✅ Dos soluciones<br>
+        x₁ = ${x1.toFixed(3)}<br>
+        x₂ = ${x2.toFixed(3)}
+        `;
+
+    } else if (d === 0) {
+
+        let x = (-b) / (2*a);
+
+        salida.innerHTML = `
+        📌 Δ = 0<br>
+        ⚠ Una solución<br>
+        x = ${x.toFixed(3)}
+        `;
+
+    } else {
+
+        let real = (-b / (2*a)).toFixed(3);
+        let im = (Math.sqrt(-d) / (2*a)).toFixed(3);
+
+        salida.innerHTML = `
+        📌 Δ = ${d}<br>
+        ❗ Complejas<br>
+        x₁ = ${real} + ${im}i<br>
+        x₂ = ${real} - ${im}i
+        `;
+    }
+}
+
+// limpiar
+function limpiar() {
+    document.getElementById("a").value = "";
+    document.getElementById("b").value = "";
+    document.getElementById("c").value = "";
+    document.getElementById("salida").innerHTML = "";
+}
+
+// regresar
+function regresar() {
+    window.history.back();
+}
+
+</script>
+
+</body>
+</html>

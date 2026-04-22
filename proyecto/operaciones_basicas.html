@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Básica</title>
+
+<style>
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --btn: #334155;
+    --primary: #38bdf8;
+    --success: #22c55e;
+    --danger: #ef4444;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: white;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+h1 { color: var(--primary); }
+
+input {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    margin: 10px 0;
+    box-sizing: border-box;
+    caret-color: transparent;
+}
+
+.resultado {
+    margin-top: 10px;
+    font-size: 18px;
+    background: var(--panel);
+    padding: 15px;
+    border-radius: 10px;
+    min-height: 24px;
+}
+
+.teclado {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+button {
+    padding: 18px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    background: var(--btn);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.1s;
+}
+
+button:active { transform: scale(0.95); }
+
+/* BOTONES AZULES (COLUMNA DERECHA) */
+.lado-derecho {
+    background: var(--primary) !important;
+    color: black !important;
+}
+
+/* IGUAL */
+.igual { background: var(--success); color: black; }
+
+/* REGRESAR */
+.btn-regresar {
+    grid-column: span 4;
+    background: var(--danger);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🧮 Calculadora</h1>
+
+<input type="text" id="pantalla" readonly>
+
+<div class="resultado" id="resultado"></div>
+
+<div class="teclado">
+
+    <!-- FILA 1 -->
+    <button onclick="inputValue('7')">7</button>
+    <button onclick="inputValue('8')">8</button>
+    <button onclick="inputValue('9')">9</button>
+    <button class="lado-derecho" onclick="clearAll()">C</button>
+
+    <!-- FILA 2 -->
+    <button onclick="inputValue('4')">4</button>
+    <button onclick="inputValue('5')">5</button>
+    <button onclick="inputValue('6')">6</button>
+    <button class="lado-derecho" onclick="deleteOne()">⌫</button>
+
+    <!-- FILA 3 -->
+    <button onclick="inputValue('1')">1</button>
+    <button onclick="inputValue('2')">2</button>
+    <button onclick="inputValue('3')">3</button>
+    <button class="lado-derecho" onclick="inputValue('-')">−</button>
+
+    <!-- FILA 4 -->
+    <button onclick="inputValue('(')">(</button>
+    <button onclick="inputValue('0')">0</button>
+    <button onclick="inputValue(')')">)</button>
+    <button class="lado-derecho" onclick="inputValue('+')">+</button>
+
+    <!-- FILA 5 -->
+    <button onclick="inputValue('.')">.</button>
+    <button onclick="inputValue('*')">×</button>
+    <button onclick="inputValue('/')">÷</button>
+    <button class="igual" onclick="calculate()">=</button>
+
+    <!-- FILA 6 -->
+    <button class="btn-regresar" onclick="goBack()">Regresar</button>
+
+</div>
+
+</div>
+
+<script>
+
+const pantalla = document.getElementById("pantalla");
+const resultado = document.getElementById("resultado");
+
+pantalla.addEventListener("focus", () => pantalla.blur());
+pantalla.addEventListener("paste", e => e.preventDefault());
+
+function inputValue(val) {
+    pantalla.value += val;
+}
+
+function deleteOne() {
+    pantalla.value = pantalla.value.slice(0, -1);
+}
+
+function clearAll() {
+    pantalla.value = "";
+    resultado.innerHTML = "";
+}
+
+function isValid(expr) {
+    if (/[+\-*/]{2,}/.test(expr)) return false;
+
+    let stack = 0;
+    for (let c of expr) {
+        if (c === '(') stack++;
+        if (c === ')') stack--;
+        if (stack < 0) return false;
+    }
+    return stack === 0;
+}
+
+function calculate() {
+    try {
+        let expr = pantalla.value;
+
+        if (!expr) return;
+
+        if (!isValid(expr)) {
+            resultado.innerHTML = "❌ Error: expresión inválida";
+            return;
+        }
+
+        if (expr.includes("/0")) {
+            resultado.innerHTML = "❌ No se puede dividir entre 0";
+            return;
+        }
+
+        let res = Function("return " + expr)();
+
+        resultado.innerHTML = `📘 ${expr}<br>✅ Resultado: ${res}`;
+
+    } catch {
+        resultado.innerHTML = "❌ Expresión inválida";
+    }
+}
+
+function goBack() {
+    window.history.back();
+}
+
+</script>
+
+</body>
+</html>

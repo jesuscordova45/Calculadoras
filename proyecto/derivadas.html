@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de Derivadas</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+h1 {
+    color: #38bdf8;
+}
+
+input {
+    padding: 12px;
+    width: 100%;
+    font-size: 16px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: none;
+    box-sizing: border-box;
+    caret-color: transparent; /* 🔥 sin cursor */
+}
+
+button {
+    padding: 12px;
+    width: 100%;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    background: #38bdf8;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.resultado {
+    margin-top: 20px;
+    font-size: 15px;
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: left;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+/* teclado */
+.teclado {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.teclado button {
+    padding: 15px;
+    font-size: 18px;
+    background: #334155;
+    color: white;
+}
+
+.teclado button:nth-child(4n) {
+    background: #38bdf8;
+    color: black;
+}
+
+.teclado .btn-regresar {
+    grid-column: span 3;
+    background: #ef4444;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📘 Derivadas básicas</h1>
+
+<!-- 🔥 BLOQUEADO -->
+<input type="text" id="funcion" placeholder="Ej: x^2 + 3x - 1" readonly>
+
+<button onclick="derivar()">Derivar</button>
+
+<div class="resultado" id="salida"></div>
+
+<div class="teclado">
+
+    <button onclick="agregar('7')">7</button>
+    <button onclick="agregar('8')">8</button>
+    <button onclick="agregar('9')">9</button>
+    <button onclick="borrarTodo()">C</button>
+    
+    <button onclick="agregar('4')">4</button>
+    <button onclick="agregar('5')">5</button>
+    <button onclick="agregar('6')">6</button>
+    <button onclick="borrarUno()">⌫</button>
+    
+    <button onclick="agregar('1')">1</button>
+    <button onclick="agregar('2')">2</button>
+    <button onclick="agregar('3')">3</button>
+    <button onclick="agregar('x')">x</button>
+
+    <button onclick="agregar('-')">-</button>
+    <button onclick="agregar('0')">0</button>
+    <button onclick="agregar('+')">+</button>
+    <button onclick="agregar('^')">^</button>
+
+    <button onclick="agregar('/')">/</button>
+    <button class="btn-regresar" onclick="regresar()">Regresar</button>
+
+</div>
+
+</div>
+
+<script>
+
+// 🔥 bloquear teclado móvil
+const input = document.getElementById("funcion");
+
+input.addEventListener("focus", () => input.blur());
+
+// 🔥 bloquear pegar
+input.addEventListener("paste", (e) => e.preventDefault());
+
+// 🔥 MCD
+function mcd(a, b) {
+    return b === 0 ? a : mcd(b, a % b);
+}
+
+// 🔥 teclado
+function agregar(valor) {
+    input.value += valor;
+}
+
+function borrarTodo() {
+    input.value = "";
+}
+
+function borrarUno() {
+    input.value = input.value.slice(0, -1);
+}
+
+// 🔥 derivar
+function derivar() {
+
+    let f = input.value.replace(/\s/g, "");
+    let salida = document.getElementById("salida");
+
+    f = f.replace(/-/g, "+-");
+
+    let terminos = f.split("+").filter(t => t !== "");
+    let resultado = [];
+    let pasos = "";
+
+    for (let t of terminos) {
+
+        if (/^-?\d+\/\d*x\^\d+$/.test(t)) {
+
+            let [frac, parteX] = t.split("x^");
+            let [num, den] = frac.split("/");
+
+            num = parseInt(num);
+            den = parseInt(den);
+
+            let exp = parseInt(parteX);
+
+            let nuevoNum = num * exp;
+            let nuevoDen = den;
+            let nuevoExp = exp - 1;
+
+            let divisor = mcd(Math.abs(nuevoNum), Math.abs(nuevoDen));
+            nuevoNum /= divisor;
+            nuevoDen /= divisor;
+
+            let termino = (nuevoDen === 1)
+                ? `${nuevoNum}x^${nuevoExp}`
+                : `${nuevoNum}/${nuevoDen}x^${nuevoExp}`;
+
+            if (nuevoExp === 1) termino = termino.replace("^1", "");
+            if (nuevoExp === 0) termino = termino.replace(/x\^0|x/, "");
+
+            resultado.push(termino);
+            pasos += `📌 ${t} → fracción<br>`;
+            continue;
+        }
+
+        else if (/^-?\d*\.?\d*x\^\d+$/.test(t)) {
+
+            let partes = t.split("x^");
+            let coef = partes[0];
+
+            if (coef === "" || coef === "+") coef = 1;
+            if (coef === "-") coef = -1;
+
+            coef = parseFloat(coef);
+
+            let exp = parseInt(partes[1]);
+
+            let nuevoCoef = coef * exp;
+            let nuevoExp = exp - 1;
+
+            let termino = "";
+
+            if (nuevoExp === 0) termino = `${nuevoCoef}`;
+            else if (nuevoExp === 1) termino = `${nuevoCoef}x`;
+            else termino = `${nuevoCoef}x^${nuevoExp}`;
+
+            resultado.push(termino);
+            pasos += `📌 ${t} → potencia<br>`;
+        }
+
+        else if (/^-?x\^\d+$/.test(t)) {
+
+            let exp = parseInt(t.split("^")[1]);
+            let signo = t.startsWith("-") ? -1 : 1;
+
+            let nuevoCoef = signo * exp;
+            let nuevoExp = exp - 1;
+
+            let termino = "";
+
+            if (nuevoExp === 0) termino = `${nuevoCoef}`;
+            else if (nuevoExp === 1) termino = `${nuevoCoef}x`;
+            else termino = `${nuevoCoef}x^${nuevoExp}`;
+
+            resultado.push(termino);
+        }
+
+        else if (/^-?\d*\.?\d*x$/.test(t)) {
+
+            let coef = t.replace("x", "");
+
+            if (coef === "" || coef === "+") coef = 1;
+            if (coef === "-") coef = -1;
+
+            resultado.push(`${coef}`);
+        }
+
+        else if (t === "x") resultado.push("1");
+        else if (t === "-x") resultado.push("-1");
+
+        else if (/^-?\d+(\.\d+)?$/.test(t)) resultado.push("0");
+
+        else {
+            salida.innerHTML = "❌ Expresión no válida";
+            return;
+        }
+    }
+
+    resultado = resultado.filter(r => r !== "0");
+    if (resultado.length === 0) resultado = ["0"];
+
+    let final = resultado[0];
+
+    for (let i = 1; i < resultado.length; i++) {
+        if (resultado[i].startsWith("-")) {
+            final += " - " + resultado[i].substring(1);
+        } else {
+            final += " + " + resultado[i];
+        }
+    }
+
+    salida.innerHTML = `${pasos}<br>✅ Derivada: ${final}`;
+}
+
+// 🔥 regresar
+function regresar() {
+    window.history.back();
+}
+
+</script>
+
+</body>
+</html>

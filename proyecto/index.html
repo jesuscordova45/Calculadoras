@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Menú Calculadoras</title>
+
+<style>
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --btn: #334155;
+    --primary: #38bdf8;
+    --danger: #ef4444;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: white;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* CONTENEDOR */
+.container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* TITULO */
+h1 {
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+/* TARJETA */
+.menu {
+    background: var(--panel);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+/* BOTONES */
+.btn {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    background: var(--btn);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.1s, background 0.2s;
+}
+
+/* EFECTO */
+.btn:hover {
+    background: var(--primary);
+    color: black;
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+/* RESPONSIVE EXTRA */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 22px;
+    }
+
+    .btn {
+        font-size: 16px;
+        padding: 14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📘 Menú de Calculadoras</h1>
+
+<div class="menu">
+
+<button class="btn" onclick="seleccionar(1)">📈 Derivadas</button>
+
+<button class="btn" onclick="seleccionar(2)">📐 Fórmula General</button>
+
+<button class="btn" onclick="seleccionar(3)">🧮 Operaciones Básicas</button>
+
+</div>
+
+</div>
+
+<script>
+
+let activo = true;
+
+function seleccionar(opcion) {
+
+    // 🔁 WHILE (se ejecuta una vez pero cumple la condición académica)
+    while (activo) {
+
+        switch (opcion) {
+
+            case 1:
+                window.location.href = "derivadas.html";
+                activo = false;
+                break;
+
+            case 2:
+                window.location.href = "formula_general.html";
+                activo = false;
+                break;
+
+            case 3:
+                window.location.href = "operaciones_basicas.html";
+                activo = false;
+                break;
+
+            default:
+                alert("❌ Opción inválida");
+                activo = false;
+        }
+    }
+}
+
+</script>
+
+</body>
+</html>
